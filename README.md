@@ -332,6 +332,7 @@ Available configuration options are:
 
 - `enable_pauses` (boolean) whether job processing can be paused. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_PAUSES`.
 - `enable_priority` (boolean) whether to use job priority in dequeuing and sorting. Defaults to `true` for backwards compatibility. You can also set this with the environment variable `GOOD_JOB_ENABLE_PRIORITY`. Make sure you update database indexes to add/remove priority whenever changing this value. When disabled, jobs are processed in FIFO (first-in, first-out) order only. GoodJob will log a warning if jobs are enqueued with non-default priority value.
+- `enable_dequeue_schedule_ordered` (boolean) whether to use scheduled_at for dequeing and sorting instead of created_at. Defaults to `false` for backwards compatibility. You can also set this with the environment variable `GOOD_JOB_ENABLE_DEQUEUE_SCHEDULE_ORDERED`. Make sure you update database indexes to add/remove priority whenever changing this value.
 
 By default, GoodJob configures the following execution modes per environment:
 
