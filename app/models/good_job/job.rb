@@ -145,7 +145,13 @@ module GoodJob
     scope :dequeueing_ordered, (lambda do |parsed_queues|
       relation = self
       relation = relation.queue_ordered(parsed_queues[:include]) if parsed_queues && parsed_queues[:ordered_queues] && parsed_queues[:include]
-      relation = relation.priority_ordered.creation_ordered
+      relation = relation.priority_ordered
+
+      relation = if GoodJob.configuration.enable_dequeue_schedule_ordered
+                   relation.schedule_ordered
+                 else
+                   relation.creation_ordered
+                 end
 
       relation
     end)

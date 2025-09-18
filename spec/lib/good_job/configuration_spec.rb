@@ -354,4 +354,28 @@ RSpec.describe GoodJob::Configuration do
       expect(configuration.advisory_lock_heartbeat).to be true
     end
   end
+
+  describe '#enable_dequeue_schedule_ordered' do
+    it 'defaults to false' do
+      configuration = described_class.new({})
+      expect(configuration.enable_dequeue_schedule_ordered).to be false
+    end
+
+    it 'can be overridden by options' do
+      configuration = described_class.new({ enable_dequeue_schedule_ordered: true })
+      expect(configuration.enable_dequeue_schedule_ordered).to be true
+    end
+
+    it 'can be overridden by rails config' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ enable_dequeue_schedule_ordered: true })
+      configuration = described_class.new({})
+      expect(configuration.enable_dequeue_schedule_ordered).to be true
+    end
+
+    it 'can be overridden by environment variable' do
+      stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_ENABLE_DEQUEUE_SCHEDULE_ORDERED' => 'true' })
+      configuration = described_class.new({})
+      expect(configuration.enable_dequeue_schedule_ordered).to be true
+    end
+  end
 end
