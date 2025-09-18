@@ -146,14 +146,17 @@ module GoodJob
       relation = self
       relation = relation.queue_ordered(parsed_queues[:include]) if parsed_queues && parsed_queues[:ordered_queues] && parsed_queues[:include]
 
-      relation = if GoodJob.configuration.enable_priority
-                   relation.priority_ordered.creation_ordered
+      relation = relation.priority_ordered if GoodJob.configuration.enable_priority
+
+      relation = if GoodJob.configuration.enable_dequeue_schedule_ordered
+                   relation.schedule_ordered
                  else
                    relation.creation_ordered
                  end
 
       relation
     end)
+
 
     # Order jobs in order of queues in array param
     # @!method queue_ordered(queues)

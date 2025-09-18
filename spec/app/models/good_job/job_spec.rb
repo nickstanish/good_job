@@ -572,23 +572,45 @@ RSpec.describe GoodJob::Job do
     end
 
     describe '.dequeueing_ordered' do
-      let!(:first_job) { described_class.create!(priority: 10, created_at: 2.minutes.ago) }
-      let!(:second_job) { described_class.create!(priority: 5, created_at: 1.minute.ago) }
-      let!(:third_job) { described_class.create!(priority: 20, created_at: 30.seconds.ago) }
+      context 'when configuring priority' do
+        let!(:first_job) { described_class.create!(priority: 10, created_at: 2.minutes.ago) }
+        let!(:second_job) { described_class.create!(priority: 5, created_at: 1.minute.ago) }
+        let!(:third_job) { described_class.create!(priority: 20, created_at: 30.seconds.ago) }
 
-      context 'when priority is enabled (default)' do
-        it 'orders by priority first, then creation time' do
-          allow(Rails.application.config).to receive(:good_job).and_return({ enable_priority: true })
-          expect(described_class.dequeueing_ordered({}).pluck(:priority)).to eq([5, 10, 20])
+        context 'when priority is enabled (default)' do
+          it 'orders by priority first, then creation time' do
+            allow(Rails.application.config).to receive(:good_job).and_return({ enable_priority: true })
+            expect(described_class.dequeueing_ordered({}).pluck(:priority)).to eq([5, 10, 20])
+          end
+        end
+
+        context 'when priority is disabled' do
+          it 'orders by creation time only (FIFO)' do
+            allow(Rails.application.config).to receive(:good_job).and_return({ enable_priority: false })
+            result_ids = described_class.dequeueing_ordered({}).pluck(:id)
+            expected_ids = [first_job.id, second_job.id, third_job.id]
+            expect(result_ids).to eq(expected_ids)
+          end
         end
       end
 
-      context 'when priority is disabled' do
-        it 'orders by creation time only (FIFO)' do
-          allow(Rails.application.config).to receive(:good_job).and_return({ enable_priority: false })
-          result_ids = described_class.dequeueing_ordered({}).pluck(:id)
-          expected_ids = [first_job.id, second_job.id, third_job.id]
-          expect(result_ids).to eq(expected_ids)
+      context 'when configuring dequeue order' do
+        let!(:first_job) { described_class.create!(priority: 10, created_at: 5.minutes.ago, scheduled_at: 3.minutes.ago) }
+        let!(:second_job) { described_class.create!(priority: 10, created_at: 4.minutes.ago, scheduled_at: 1.second.ago) }
+        let!(:third_job) { described_class.create!(priority: 10, created_at: 3.minutes.ago, scheduled_at: 5.minutes.ago) }
+
+        context 'when enable_dequeue_schedule_ordered is false (default)' do
+          it 'orders by creation time' do
+            allow(Rails.application.config).to receive(:good_job).and_return({ enable_dequeue_schedule_ordered: false })
+            expect(described_class.dequeueing_ordered({}).pluck(:id)).to eq([first_job.id, second_job.id, third_job.id])
+          end
+        end
+
+        context 'when enable_dequeue_schedule_ordered is true' do
+          it 'orders by scheduled time' do
+            allow(Rails.application.config).to receive(:good_job).and_return({ enable_dequeue_schedule_ordered: true })
+            expect(described_class.dequeueing_ordered({}).pluck(:id)).to eq([third_job.id, first_job.id, second_job.id])
+          end
         end
       end
     end

@@ -41,6 +41,8 @@ module GoodJob
     DEFAULT_ENABLE_PAUSES = false
     # Default enable_priority setting
     DEFAULT_ENABLE_PRIORITY = true
+    # Default enable_dequeue_schedule_ordered setting
+    DEFAULT_ENABLE_DEQUEUE_SCHEDULE_ORDERED = false
 
     def self.validate_execution_mode(execution_mode)
       raise ArgumentError, "GoodJob execution mode must be one of #{EXECUTION_MODES.join(', ')}. It was '#{execution_mode}' which is not valid." unless execution_mode.in?(EXECUTION_MODES)
@@ -386,6 +388,7 @@ module GoodJob
       DEFAULT_ENABLE_PAUSES
     end
 
+<<<<<<< HEAD
     # Whether to use job priority in dequeuing and sorting.
     # @return [Boolean]
     def enable_priority
@@ -394,6 +397,16 @@ module GoodJob
       return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ENABLE_PRIORITY']) unless env['GOOD_JOB_ENABLE_PRIORITY'].nil?
 
       DEFAULT_ENABLE_PRIORITY
+=======
+    # Whether to use scheduled_at in dequeuing and sorting instead of creeated_at.
+    # @return [Boolean]
+    def enable_dequeue_schedule_ordered
+      return options[:enable_dequeue_schedule_ordered] unless options[:enable_dequeue_schedule_ordered].nil?
+      return rails_config[:enable_dequeue_schedule_ordered] unless rails_config[:enable_dequeue_schedule_ordered].nil?
+      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ENABLE_DEQUEUE_SCHEDULE_ORDERED']) unless env['GOOD_JOB_ENABLE_DEQUEUE_SCHEDULE_ORDERED'].nil?
+
+      DEFAULT_ENABLE_DEQUEUE_SCHEDULE_ORDERED
+>>>>>>> 2b742a0 (Add configuration to order by scheduled_at)
     end
 
     # Whether running in a web server process.
