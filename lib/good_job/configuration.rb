@@ -388,7 +388,6 @@ module GoodJob
       DEFAULT_ENABLE_PAUSES
     end
 
-<<<<<<< HEAD
     # Whether to use job priority in dequeuing and sorting.
     # @return [Boolean]
     def enable_priority
@@ -397,7 +396,8 @@ module GoodJob
       return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ENABLE_PRIORITY']) unless env['GOOD_JOB_ENABLE_PRIORITY'].nil?
 
       DEFAULT_ENABLE_PRIORITY
-=======
+    end
+
     # Whether to use scheduled_at in dequeuing and sorting instead of creeated_at.
     # @return [Boolean]
     def enable_dequeue_schedule_ordered
@@ -406,7 +406,6 @@ module GoodJob
       return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ENABLE_DEQUEUE_SCHEDULE_ORDERED']) unless env['GOOD_JOB_ENABLE_DEQUEUE_SCHEDULE_ORDERED'].nil?
 
       DEFAULT_ENABLE_DEQUEUE_SCHEDULE_ORDERED
->>>>>>> 2b742a0 (Add configuration to order by scheduled_at)
     end
 
     # Whether running in a web server process.
